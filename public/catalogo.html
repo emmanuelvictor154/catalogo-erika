@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Catálogo Virtual - Erika Makeups</title>
+  <style>
+    body { font-family: Arial, sans-serif; background-color: #fcf8f8; margin: 0; padding: 20px; color: #333; }
+    h1 { color: #d63384; text-align: center; font-size: 24px; }
+    .vitrine { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 15px; margin-top: 20px; }
+    .card { background: white; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); padding: 10px; text-align: center; display: flex; flex-direction: column; justify-content: space-between; }
+    .card img { width: 100%; height: 120px; object-fit: cover; border-radius: 6px; }
+    .card h3 { font-size: 16px; margin: 10px 0 5px 0; color: #444; }
+    .card p { font-size: 14px; font-weight: bold; color: #d63384; margin: 0 0 10px 0; }
+    .btn-add { background-color: #d63384; color: white; border: none; padding: 8px; width: 100%; border-radius: 4px; cursor: pointer; font-size: 13px; }
+    .btn-add:hover { background-color: #b8226e; }
+    .carrinho-fixo { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); background: #25d366; color: white; padding: 15px 30px; border-radius: 30px; font-weight: bold; font-size: 16px; box-shadow: 0 4px 10px rgba(0,0,0,0.2); display: none; text-align: center; width: 80%; max-width: 300px; text-decoration: none; }
+  </style>
+</head>
+<body>
+
+  <h1>✨ Erika Makeups ✨</h1>
+  <div class="vitrine" id="vitrine">
+    <!-- As maquiagens do banco vão aparecer aqui dentro automaticamente -->
+  </div>
+
+  <!-- O link agora chama o servidor local sem target="_blank" -->
+  <a class="carrinho-fixo" id="btnCarrinho" href="#">
+    🛒 Enviar Pedido (0)
+  </a>
+
+  <script>
+    let carrinho = [];
+
+    async function carregarProdutos() {
+      try {
+        const resposta = await fetch('/produtos');
+        const produtos = await resposta.json();
+        const vitrine = document.getElementById('vitrine');
+        vitrine.innerHTML = '';
+
+        produtos.forEach(p => {
+          vitrine.innerHTML += `
+            <div class="card">
+              <img src="${p.imagem_url}" alt="${p.nome}">
+              <h3>${p.nome}</h3>
+              <p>R$ ${parseFloat(p.preco).toFixed(2)}</p>
+              <button class="btn-add" onclick="adicionarAoCarrinho('${p.nome}', ${p.preco})">Adicionar</button>
+            </div>
+          `;
+        });
+      } catch (e) {
+        console.error('Erro ao carregar catálogo', e);
+      }
+    }
+
+    function adicionarAoCarrinho(nome, preco) {
+      carrinho.push({ nome, preco });
+      atualizarCarrinhoELink();
+    }
+
+    function atualizarCarrinhoELink() {
+      const btn = document.getElementById('btnCarrinho');
+      
+      if (carrinho.length > 0) {
+        btn.style.display = 'block';
+        btn.innerText = "🛒 Enviar Pedido (" + carrinho.length + ")";
+        
+        let texto = "Olá Erika! Gostaria de fazer o seguinte pedido:\n\n";
+        let total = 0;
+        
+        carrinho.forEach((item, index) => {
+          texto += (index + 1) + ". " + item.nome + " - R$ " + parseFloat(item.preco).toFixed(2) + "\n";
+          total += parseFloat(item.preco);
+        });
+        
+        texto += "\n*Total do Pedido: R$ " + total.toFixed(2) + "*";
+        
+        // MUDANÇA REAL: Aponta para a rota do seu próprio servidor backend
+        btn.href = "/enviar-pedido?texto=" + encodeURIComponent(texto);
+      } else {
+        btn.style.display = 'none';
+      }
+    }
+
+    carregarProdutos();
+  </script>
+</body>
+</html>

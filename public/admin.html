@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Painel Administrativo - Erika Makeups</title>
+  <style>
+    body { font-family: Arial, sans-serif; background-color: #fcf8f8; color: #333; margin: 20px; }
+    .container { max-width: 500px; background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); margin: 0 auto; }
+    h2 { color: #d63384; text-align: center; }
+    label { font-weight: bold; display: block; margin-top: 10px; }
+    input, select, textarea { width: 100%; padding: 8px; margin-top: 5px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; }
+    button { background-color: #d63384; color: white; border: none; padding: 10px; width: 100%; border-radius: 4px; font-size: 16px; cursor: pointer; margin-top: 15px; }
+    button:hover { background-color: #b8226e; }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <h2>Cadastrar Maquiagem</h2>
+    <form id="formProduto">
+      <label>Nome do Produto:</label>
+      <input type="text" id="nome" placeholder="Ex: Batom Matte Vermelho" required>
+
+      <label>Categoria:</label>
+      <select id="categoria">
+        <option value="Boca">Boca</option>
+        <option value="Pele">Pele</option>
+        <option value="Olhos">Olhos</option>
+        <option value="Acessórios">Acessórios</option>
+      </select>
+
+      <label>Preço (R$):</label>
+      <input type="number" id="preco" step="0.01" placeholder="0.00" required>
+
+      <label>Descrição:</label>
+      <textarea id="descricao" placeholder="Ex: Longa duração, efeito aveludado..."></textarea>
+
+      <label>Link da Imagem (Provisório):</label>
+      <input type="text" id="imagem_url" placeholder="Cole o link de uma foto para testar">
+
+      <button type="submit">Salvar no Catálogo</button>
+    </form>
+  </div>
+
+  <script>
+    document.getElementById('formProduto').addEventListener('submit', async (e) => {
+      e.preventDefault(); // Impede a página de recarregar
+      
+      // Pega os dados digitados na tela
+      const dados = {
+        nome: document.getElementById('nome').value,
+        categoria: document.getElementById('categoria').value,
+        preco: parseFloat(document.getElementById('preco').value),
+        descricao: document.getElementById('descricao').value,
+        imagem_url: document.getElementById('imagem_url').value || 'https://placeholder.com'
+      };
+
+      try {
+        // Envia os dados para a rota POST que criamos no backend
+        const resposta = await fetch('/produtos', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(dados)
+        });
+
+        const resultado = await resposta.json();
+        
+        if (resposta.ok) {
+          alert('Maquiagem salva com sucesso!');
+          document.getElementById('formProduto').reset(); // Limpa os campos
+        } else {
+          alert('Erro ao salvar: ' + resultado.erro);
+        }
+      } catch (erro) {
+        alert('Erro de conexão com o servidor.');
+      }
+    });
+  </script>
+</body>
+</html>
