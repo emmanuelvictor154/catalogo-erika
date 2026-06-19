@@ -24,8 +24,7 @@
     <!-- As maquiagens do banco vão aparecer aqui dentro automaticamente -->
   </div>
 
-  <!-- O link agora chama o servidor local sem target="_blank" -->
-  <a class="carrinho-fixo" id="btnCarrinho" href="#">
+  <a class="carrinho-fixo" id="btnCarrinho" href="#" target="_blank">
     🛒 Enviar Pedido (0)
   </a>
 
@@ -76,8 +75,8 @@
         
         texto += "\n*Total do Pedido: R$ " + total.toFixed(2) + "*";
         
-        // MUDANÇA REAL: Aponta para a rota do seu próprio servidor backend
-        btn.href = "/enviar-pedido?texto=" + encodeURIComponent(texto);
+        // Link direto da API do WhatsApp configurado com o número correto
+        btn.href = "https://whatsapp.com/send?phone=5583988765110&text=" + encodeURIComponent(texto);
       } else {
         btn.style.display = 'none';
       }
