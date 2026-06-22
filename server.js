@@ -53,11 +53,12 @@ app.post('/produtos', async (req, res) => {
 });
 
 // ==========================================
-// 3. ROTA DE LISTAGEM (Cliente / Catálogo)
+// 3. ROTA DE LISTAGEM CORRIGIDA (Cliente / Catálogo)
 // ==========================================
 app.get('/produtos', async (req, res) => {
   try {
-    const resultado = await pool.query('SELECT * FROM produtos WHERE disponivel = TRUE ORDER BY id DESC');
+    // Pegamos os produtos e renomeamos 'imagem_url' para 'imagem' para bater com o HTML do catálogo!
+    const resultado = await pool.query('SELECT id, nome, categoria, preco, descricao, imagem_url AS imagem, disponivel FROM produtos WHERE disponivel = TRUE ORDER BY id DESC');
     res.json(resultado.rows);
   } catch (erro) {
     res.status(500).json({ erro: "Erro ao buscar." });
@@ -65,14 +66,13 @@ app.get('/produtos', async (req, res) => {
 });
 
 // ==========================================
-// 4. ROTA EXCLUSIVA DE REDIRECIONAMENTO WHATSAPP
+// 4. ROTA EXCLUSIVA DE REDIRECIONAMENTO WHATSAPP CORRIGIDA
 // ==========================================
 app.get('/enviar-pedido', (req, res) => {
   const texto = req.query.texto || '';
-  // Usa o link oficial do WhatsApp com o seu número de Campina Grande
-  const urlWhatsApp = "https://whatsapp.com" + encodeURIComponent(texto);
+  // Formato wa.me oficial com o número correto configurado no servidor
+  const urlWhatsApp = "https://wa.me/5583988765110?text=" + encodeURIComponent(texto);
   
-  // O servidor força a mudança de página de forma direta e segura
   res.redirect(urlWhatsApp);
 });
 
